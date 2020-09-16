@@ -1,0 +1,23 @@
+name: 'versio-actions-install'
+description: 'Install Versio'
+author: 'Charlie Ozinga <ozchaz@gmail.com>'
+branding:
+  icon: play-circle
+  color: black
+inputs: {}
+
+outputs:
+  versio:
+    description: Installed Versio version
+
+runs:
+  using: 'composite'
+  steps:
+    - run: |
+        mkdir -p $HOME/bin
+        echo "::add-path::$HOME/bin"
+      shell: bash
+    - run: ${{ github.action_path }}/install.sh
+      shell: bash
+    - run: echo "::set-output name=versio::$(versio -V | cut -d' ' -f 2)"
+      shell: bash
