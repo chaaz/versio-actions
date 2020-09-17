@@ -3,8 +3,12 @@ name = "yambler"
 version = "0.1.0"
 authors = ["Charlie Ozinga <ozchaz@gmail.com>"]
 edition = "2018"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+description = "Yambler is a tool to stitch reusable yaml snippets together."
+homepage = "https://github.com/chaaz/versio-actions/tree/changes/yambler/"
+repository = "https://github.com/chaaz/versio-actions/"
+license-file = "LICENSE.txt"
+keywords = ["yaml", "actions", "development", "configuration"]
+categories = ["command-line-utilities", "config"]
 
 [dependencies]
 serde_yaml = "0.8"

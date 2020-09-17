@@ -14,23 +14,50 @@ This replaces _placeholder strings_ in the input file with YAML objects
 defined in the snippet files, writing the resultant document to the
 output file.
 
+## Getting Started
+
+Download the Yambler binary for your platform from our
+[Releases](https://github.com/chaaz/versio-actions/releases) pages, and
+start yambling some yamls.
+
 ## For GitHub Actions
 
 As of this writing, it's difficult to reuse common logic in the various
 workflows that you build for GitHub Actions. You're either stuck
 publishing custom actions (which themselves are limited in what they can
 reuse), hacking some shell scripts together, or doing some big
-copy-and-paste and hoping you remember where everything is when you need
-change things.
+copy-and-paste and hoping you remember where all the copies are when you
+need to make a change.
 
 The Yambler was written to deal with this problem: it's not an ideal
-solution (more powerful composite actions and/or respecting YAML
-aliases/anchors would probably be better), but this lets you at least
-keep your workflows relatively DRY.
+solution (GitHub is working on more elegant solutions), but this lets
+you at least keep your workflows relatively
+[DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself).
 
-I currently have `.github/workflows-src` directory in my repos, which is
-where I keep the "source" workflow templates. Such a template might look
-something like this:
+### Example
+
+The Yambler is used in the CI/CD pipelines of the
+[Versio](https://github.com/chaaz/versio) release manager, another handy
+developer tool. My `.github` directory there looks something like this:
+
+```
+.github
+├─ workflows-src
+│  ├─ pr.yml
+│  └─ release.yml
+├─ snippets
+│  ├─ check-versio.yml
+│  ├─ common-env.yml
+│  ├─ job-premerge-checks.yml
+│  └─ <other snippet files ...>
+└─ workflows
+   ├─ pr.yml
+   └─ release.yml
+```
+
+I don't touch anything in `workflows` directly: everything there is
+script-generated. Instead, `workflows-src` is where I do my top-level
+editing. `.github/workflows-src/pr.yml` looks something like this:
 
 ```yaml
 ---
@@ -44,37 +71,48 @@ jobs:
   premerge-checks: SNIPPET_job-premerge-checks
 ```
 
-I then keep my snippets, one per file, in their own directory, e.g.
-`.github/snippets/job-create-matrixes.yml`. Just before I push my repo,
-I generate the actual workflows with a script:
+I then keep my snippets, one per file, in `.github/snippets`. Here's
+`common-env.yml`:
 
-```bash
-rm -f $repo/.github/workflows/*.*
-for f in $repo/.github/workflows-src/*.* ; do
-  yambler \
-    -i "$f" \
-    -o "$repo/.github/workflows/`basename $f`" \
-    -s $repo/.github/snippets/*.*
-  done
+```yaml
+key: common-env
+value:
+  RUSTFLAGS: '-D warnings'
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GITHUB_USER: ${{ github.actor }}
 ```
 
-This script is available in this repository as `scripts/yamble-repo.sh`
+Just before I push my repo, I generate the actual workflows by calling
+`yambler` once for each `workflow-src` file:
+
+```bash
+yambler \
+    -i .github/workflows-src/pr.yml \
+    -o .github/workflows/pr.yml \
+    -s .github/snippets/*.yml
+```
+
+Of course, there's a script that automatically does this for each file,
+available in this repository as `scripts/yamble-repo.sh`
 [here](../scripts/yamble-repo.sh). Feel free to use it directly, or
-modify it to taste. There's also a similar script named
+modify it to taste; it's pretty straightforward. There's also a
+companion script named
 [yamble-repo-pre-push.sh](../scripts/yamble-repo-pre-push.sh), which you
 can copy to a file named `.git/hooks/pre-push` in your local repo to
-ensure that your workflows are up-to-date before pushing.
+ensure that your workflows are up-to-date when you push.
 
-Due the nature of how GitHub Actions work, the generated workflows do
-need to be committed and pushed: while it would be theoretically
-possible to generate and execute these workflows automatically (possibly
-in its own static workflow), I find it easier just to run this manually
-before I push, or whenever I change the workflow sources.
+Due the nature of how GitHub Actions work, the generated workflows must
+be committed and pushed: you can't `.gitignore` them (like you'd
+normally want to do to generated files) or you defeat their whole
+purpose. While it would be theoretically possible to generate and
+execute these workflows automatically (possibly in its own static
+workflow), I find it easier just to run this manually before I push, or
+whenever I change the workflow sources.
 
 ## Operation
 
-This is how the application works: First, all documents of the input
-file are read, and everywhere a placeholder string of the form
+This is how the Yambler works: First, all documents of the input file
+are read, and wherever a placeholder string of the form
 "SNIPPET\_&lt;snippet name&gt;" is encountered, it is replaced by the
 YAML snippet value defined in the snippet files. This process happens
 recursively, so snippets can contain other snippets, etc. Infinite loops
@@ -90,33 +128,36 @@ could be replaced by simple quotes, etc.
 Using Yambler is roughly analogous to using a macro language such as
 C/C++ macros, VBA, or ML/1; with many of the same benefits and pitfalls.
 There is no parameter passing or templating: snippets are inserted
-verbatim into the text, so keep that in mind as you use them.
+verbatim into the text, so keep that in mind as you use them. On the
+other hand, this makes it very easy to judge what your final output is
+going to be.
 
 ### Snippets
 
-A snippet file can have multiple documents, and each is considered a
-snippet: it's expected that each document is a hash with at least the
-two keys "key" and "value". The "key" must be a string that defines
-snippet key (which is identified in the placeholder string); the "value"
-is the YAML value itself, which can have any YAML type.
+A snippet file can have multiple documents, and each is considered its
+own snippet: each snippet document must be a hash with at least the two
+keys "key" and "value". (You can have other keys: they're just ignored.)
+The "key" must be a string that defines the snippet key (which is
+identified in the placeholder string); the "value" is the YAML value
+itself, which can have any YAML type.
 
-The names of the snippet files is largely irrelevant, but it's good
+The names of the snippet files are largely irrelevant, but it's good
 practice to have at least some association between the file name and the
-snippets contained within, so that it's easy to find a particular
-snippet when you need to quickly find it.
+snippets contained within, so that it's easy to quickly find a
+particular snippet.
 
 If multiple snippets are defined with the same key, the behavior is
 undefined, although what probably happens is that the last defined
-snippet is the one that "wins" that key.
+snippet is the one that "wins" that key. Don't do this!
 
 ### Splicing
 
-An exception to the above operation is the _splice rule_: if the
-placeholder string is in an array, and the snippet that is replacing it
-is _also_ an array, then the snippet array is spliced in directly,
-rather than replacing the single element. This makes it easy to place a
-snippet directly inside a array, or to concatenate multiple snippets to
-form a longer list.
+One exception to the replacement described above is the _splice rule_:
+if the placeholder string is a direct array element, and the replacement
+snippet is _also_ an array, then the snippet array is spliced in
+directly, rather than replacing the single element. This makes it easy
+to place a snippet directly inside a array, or to concatenate multiple
+snippets to form a longer list.
 
 ## Examples
 
