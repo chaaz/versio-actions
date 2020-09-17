@@ -1,0 +1,23 @@
+options:
+  prev_tag: "versio-prev"
+
+projects:
+  - name: "yambler"
+    root: "yambler"
+    id: 1
+    tag_prefix: "yambler"
+    version:
+      file: "Cargo.toml"
+      toml: "package.version"
+
+  - name: "install"
+    root: "install"
+    id: 2
+    tag_prefix: "install"
+    version:
+      tags:
+        default: "0.0.0"
+
+sizes:
+  use_angular: true
+  fail: ["*"]
