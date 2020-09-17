@@ -9,7 +9,7 @@
 #
 # - If you've made changes to your workflow sources, you need to
 # regenerate the workflows, or else GitHub Actions won't use your
-# changes. Alternately, if you've erronously
+# changes.
 #
 # - If you've accidently made changes directly to the generated
 # workflows (which you should not do), this script will warn you, giving

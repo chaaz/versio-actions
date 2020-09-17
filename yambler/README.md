@@ -146,7 +146,7 @@ form a longer list.
   ```
   Snippet:
   ```yaml
-  key: family
+  key: job1
   value:
     name: 'complex job'
     run: |
