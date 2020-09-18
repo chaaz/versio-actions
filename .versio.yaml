@@ -10,6 +10,14 @@ projects:
       file: "Cargo.toml"
       toml: "package.version"
 
+  - name: "scripts"
+    root: "scripts"
+    id: 3
+    tag_prefix: "scripts"
+    version:
+      tags:
+        default: "0.0.0"
+
   - name: "install"
     root: "install"
     id: 2
