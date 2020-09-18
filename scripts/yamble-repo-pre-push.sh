@@ -19,19 +19,28 @@
 # see https://github.com/chaaz/versio-actions/tree/main/yambler.
 
 repo=`git rev-parse --show-toplevel`
+ghdir="$repo/.github"
 tmp_dir=`mktemp -d -t yamble-pre-push`
 
-for f in $repo/.github/workflows-src/*.* ; do
-  s=`basename $f`
-  yambler \
-    -i "$f" \
-    -o "$tmp_dir/$s" \
-    -s $repo/.github/snippets/*.*
-  if ! diff "$repo/.github/workflows/$s" "$tmp_dir/$s" >/dev/null 2>&1 ; then
-    echo >&2 "Workflow $s is out-of-date"
-    rm -rf $tmp_dir
-    exit 1
+yambler -i "$ghdir/workflows-src" -o "$tmp_dir" -s "$ghdir/snippets"
+
+bads=''
+for f in $tmp_dir/*.* ; do
+  b=`basename "$f"`
+  if ! diff "$f" "$ghdir/workflows/$b" >/dev/null 2>&1 ; then
+    if [ "$bads" == '' ] ; then
+      bads="$b"
+    else
+      bads="$bads, $b"
+    fi
   fi
 done
 
 rm -rf $tmp_dir
+
+if [ "$bads" != '' ] ; then
+  echo >&2 "Out of date workflows: $bads"
+  echo >&2 "Use the yambler or yamble-repo script:"
+  echo >&2 "  https://github.com/chaaz/versio-actions/tree/main/yambler"
+  exit 1
+fi

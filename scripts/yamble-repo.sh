@@ -25,11 +25,10 @@
 # workflows.
 
 repo=`git rev-parse --show-toplevel`
+ghdir="$repo/.github"
 
-rm -f $repo/.github/workflows/*.*
-for f in $repo/.github/workflows-src/*.* ; do
-  yambler \
-    -i "$f" \
-    -o "$repo/.github/workflows/`basename $f`" \
-    -s $repo/.github/snippets/*.*
-  done
+mkdir -p "$ghdir/workflows-src"
+mkdir -p "$ghdir/workflows"
+mkdir -p "$ghdir/snippets"
+
+yambler -i "$ghdir/workflows-src" -o "$ghdir/workflows" -s "$ghdir/snippets"

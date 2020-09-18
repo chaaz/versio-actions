@@ -7,14 +7,103 @@ use crate::errors::Result;
 use clap::{crate_version, App, AppSettings, Arg};
 use error_chain::bail;
 use std::collections::HashMap;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use yaml_rust::{Yaml, YamlEmitter, YamlLoader};
 
 fn run(input_file: &str, output_file: &str, snips: &[&str]) -> Result<()> {
-  let inputs: Vec<Yaml> = YamlLoader::load_from_str(&std::fs::read_to_string(input_file)?)?;
+  let inputs = read_inputs(input_file, output_file)?;
+  let snips = read_snips(snips)?;
+  convert_and_write(inputs, &snips)
+}
 
-  let snips = snips
-    .iter()
+fn convert_and_write(inputs: Vec<(PathBuf, PathBuf, Vec<Yaml>)>, snips: &HashMap<String, Yaml>) -> Result<()> {
+  for (input_file, output_file, inputs) in inputs {
+    let mut trail = Vec::new();
+    let outputs = inputs.into_iter().map(|input| replace(&mut trail, input, snips)).collect::<Result<Vec<_>>>()?;
+
+    let input_file_name = input_file.file_name().map(|n| n.to_string_lossy()).unwrap_or_else(|| "??".into());
+    let mut out_str = format!("---\n# DO NOT EDIT\n# Created from template \"{}\".\n", input_file_name);
+    let header_len = out_str.len();
+    let mut emitter = YamlEmitter::new(&mut out_str);
+    for output in &outputs {
+      emitter.dump(output)?;
+    }
+    if !outputs.is_empty() {
+      out_str.replace_range(header_len .. header_len + 4, "");
+    }
+    std::fs::write(output_file, &out_str)?;
+  }
+
+  Ok(())
+}
+
+/// Read the input file and output file, and build a list of entries to work on.
+///
+/// Each entry has the form (input_file_path, output_file_path, list_of_yamls_in_input_file). If the input file
+/// is a single file, the output file must also be a single file, and the list of entries has a length of one.
+/// If the input file is a directory, the output file must also be a directory, and the list of entries
+/// corresponds to each YAML file in the input directory.
+fn read_inputs(input_file: &str, output_file: &str) -> Result<Vec<(PathBuf, PathBuf, Vec<Yaml>)>> {
+  let input_file = Path::new(input_file);
+  let output_file = Path::new(output_file);
+
+  if input_file.is_dir() {
+    if !output_file.is_dir() {
+      bail!("If input is a directory, output must also be a directory.");
+    }
+    input_file
+      .read_dir()?
+      .filter(|entry| {
+        entry.as_ref().map(|entry| {
+          let n = entry.file_name().to_string_lossy().to_string();
+          n.ends_with(".yml") || n.ends_with(".yaml")
+        }).unwrap_or(false)
+      })
+      .map(|entry| {
+        let entry = entry?;
+        let output = output_file.join(entry.file_name());
+        Ok((entry.path(), output, YamlLoader::load_from_str(&std::fs::read_to_string(entry.path())?)?))
+      })
+      .collect::<Result<Vec<_>>>()
+  } else {
+    if output_file.is_dir() {
+      bail!("If input is a file, output must also be a file.");
+    }
+    Ok(vec![(
+      input_file.to_path_buf(),
+      output_file.to_path_buf(),
+      YamlLoader::load_from_str(&std::fs::read_to_string(input_file)?)?
+    )])
+  }
+}
+
+/// Read the snippet files into a hash map.
+///
+/// The input list of files can be multiple YAML files, or can be a single directory, in which case all YAML
+/// files in the directory are counted. The resulting hashmap are the keyed YAML snippets which are found in all
+/// files.
+fn read_snips(snips: &[&str]) -> Result<HashMap<String, Yaml>> {
+  let snips = snips.iter().map(|s| Path::new(s)).collect::<Vec<_>>();
+  let snips: Vec<_> = if snips.len() == 1 && snips[0].is_dir() {
+    snips[0]
+      .read_dir()?
+      .filter_map(|entry| {
+        entry.ok().and_then(|entry| {
+          let n = entry.file_name().to_string_lossy().to_string();
+          if n.ends_with(".yml") || n.ends_with(".yaml") {
+            Some(entry.path())
+          } else {
+            None
+          }
+        })
+      })
+      .collect()
+  } else {
+    snips.into_iter().map(|s| s.to_path_buf()).collect()
+  };
+
+  snips
+    .into_iter()
     .map(|snip| Ok(YamlLoader::load_from_str(&std::fs::read_to_string(snip)?)?))
     .collect::<Result<Vec<_>>>()?
     .into_iter()
@@ -28,24 +117,7 @@ fn run(input_file: &str, output_file: &str, snips: &[&str]) -> Result<()> {
       let val = hash.remove(&Yaml::String("value".into())).ok_or_else(|| bad!("Yaml snip doesn't have a value."))?;
       Result::Ok((key, val))
     })
-    .collect::<Result<_>>()?;
-
-  let mut trail = Vec::new();
-  let outputs = inputs.into_iter().map(|input| replace(&mut trail, input, &snips)).collect::<Result<Vec<_>>>()?;
-
-  let input_file_name = Path::new(input_file).file_name().map(|n| n.to_string_lossy()).unwrap_or_else(|| "??".into());
-  let mut out_str = format!("---\n# DO NOT EDIT\n# Created from template \"{}\".\n", input_file_name);
-  let header_len = out_str.len();
-  let mut emitter = YamlEmitter::new(&mut out_str);
-  for output in &outputs {
-    emitter.dump(output)?;
-  }
-  if !outputs.is_empty() {
-    out_str.replace_range(header_len .. header_len + 4, "");
-  }
-  std::fs::write(output_file, &out_str)?;
-
-  Ok(())
+    .collect::<Result<_>>()
 }
 
 fn replace(trail: &mut Vec<String>, input: Yaml, snips: &HashMap<String, Yaml>) -> Result<Yaml> {

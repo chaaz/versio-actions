@@ -7,12 +7,22 @@ and understand them.
 
 Run like this:
 ```
-$ yambler -i <input file> -o <output file> -s <snippet files ...>
+yambler -i <input file> -o <output file> -s <snippet files ...>
+```
+Or like this:
+```
+yambler -i <input dir> -o <output dir> -s <snippet dir>
 ```
 
-This replaces _placeholder strings_ in the input file with YAML objects
-defined in the snippet files, writing the resultant document to the
-output file.
+This replaces _placeholder strings_ in the input file(s) with YAML
+objects defined in the snippet files, writing the resultant document to
+the output file(s).
+
+The `--snippet` (`-s`) argument can be a list of files, or a single
+directory with a bunch of YAML files in it. Likewise, the `--input`
+(`-i`) argument can either be a single file, or a directory that
+contains a bunch of YAML input files. If the input is a directory, the
+output (`--output` / `-o`) must also be a directory.
 
 ## Getting Started
 
