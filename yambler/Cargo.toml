@@ -1,6 +1,6 @@
 [package]
 name = "yambler"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Charlie Ozinga <ozchaz@gmail.com>"]
 edition = "2018"
 description = "Yambler is a tool to stitch reusable yaml snippets together."
