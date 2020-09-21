@@ -1,0 +1,1 @@
+cat Cargo.toml | rq -t | jq -r .package.version
