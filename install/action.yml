@@ -15,7 +15,7 @@ runs:
   steps:
     - run: |
         mkdir -p $HOME/bin
-        echo "::add-path::$HOME/bin"
+        echo "$HOME/bin" >> $GITHUB_PATH
       shell: bash
     - run: ${{ github.action_path }}/install.sh
       shell: bash
