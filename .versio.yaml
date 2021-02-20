@@ -6,9 +6,12 @@ projects:
     root: "yambler"
     id: 1
     tag_prefix: "yambler"
+    labels: cargo
     version:
       file: "Cargo.toml"
       toml: "package.version"
+    hooks:
+      post_write: 'cargo update --workspace'
 
   - name: "scripts"
     root: "scripts"
