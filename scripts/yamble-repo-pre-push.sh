@@ -20,7 +20,7 @@
 
 repo=`git rev-parse --show-toplevel`
 ghdir="$repo/.github"
-tmp_dir=`mktemp -d -t yamble-pre-push`
+tmp_dir=`mktemp -d`
 
 yambler -i "$ghdir/workflows-src" -o "$tmp_dir" -s "$ghdir/snippets"
 
