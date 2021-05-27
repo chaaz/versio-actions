@@ -13,4 +13,4 @@ jobs:
   versio-release: SNIPPET_job-versio-release
   cratesio-publish: SNIPPET_job-cratesio-publish
   github-publish: SNIPPET_job-github-publish
-  publish: SNIPPET_job-publish
+  github-publish-bins: SNIPPET_job-publish-bins

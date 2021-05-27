@@ -168,24 +168,24 @@ jobs:
           draft: true
           prerelease: false
           commitish: main
-  publish:
+  github-publish-bins:
     needs: github-publish
     strategy:
       matrix:
         include:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
-            root: "."
+            root: yambler
             rustflags: "-D warnings -C link-args=-s"
             bin_name: yambler
           - os: macos-latest
             target: x86_64-apple-darwin
-            root: "."
+            root: yambler
             rustflags: "-D warnings"
             bin_name: yambler
           - os: windows-latest
             target: x86_64-pc-win32.exe
-            root: "."
+            root: yambler
             rustflags: "-D warnings"
             bin_name: yambler.exe
     if: "!contains(github.event.head_commit.message, 'skip ci')"
@@ -222,6 +222,6 @@ jobs:
         uses: actions/upload-release-asset@v1
         with:
           upload_url: "${{ needs.github-publish.outputs.upload_url }}"
-          asset_path: "target/release/${{ matrix.bin_name }}"
+          asset_path: "${{ matrix.root }}/target/release/${{ matrix.bin_name }}"
           asset_name: "yambler__${{ matrix.target }}"
           asset_content_type: application/octet-stream
