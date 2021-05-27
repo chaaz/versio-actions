@@ -54,10 +54,13 @@ fn read_inputs(input_file: &str, output_file: &str) -> Result<Vec<(PathBuf, Path
     input_file
       .read_dir()?
       .filter(|entry| {
-        entry.as_ref().map(|entry| {
-          let n = entry.file_name().to_string_lossy().to_string();
-          n.ends_with(".yml") || n.ends_with(".yaml")
-        }).unwrap_or(false)
+        entry
+          .as_ref()
+          .map(|entry| {
+            let n = entry.file_name().to_string_lossy().to_string();
+            n.ends_with(".yml") || n.ends_with(".yaml")
+          })
+          .unwrap_or(false)
       })
       .map(|entry| {
         let entry = entry?;
