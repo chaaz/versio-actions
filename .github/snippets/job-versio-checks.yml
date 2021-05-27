@@ -1,0 +1,15 @@
+key: job-versio-checks
+value:
+  runs-on: ubuntu-latest
+  if: SNIPPET_not-skip-ci
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Get versio
+      uses: chaaz/versio-actions/install@v1.1
+    - name: Fetch history
+      run: git fetch --unshallow
+    - name: Check projects
+      run: versio check
+    - name: Output plan
+      run: versio plan

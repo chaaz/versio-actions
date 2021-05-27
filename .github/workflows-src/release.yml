@@ -1,0 +1,16 @@
+---
+# Edit this file, and then use `yambler`
+# (github.com/chaaz/versio-actions/tree/main/yambler) to stitch.
+name: release
+on:
+  - workflow_dispatch
+env: SNIPPET_common-env
+
+jobs:
+  project-matrixes: SNIPPET_job-project-matrixes
+  versio-checks: SNIPPET_job-versio-checks
+  cargo-checks: SNIPPET_job-cargo-checks
+  versio-release: SNIPPET_job-versio-release
+  cratesio-publish: SNIPPET_job-cratesio-publish
+  github-publish: SNIPPET_job-github-publish
+  publish: SNIPPET_job-publish

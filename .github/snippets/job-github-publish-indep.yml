@@ -1,0 +1,10 @@
+key: job-github-publish-indep
+value:
+  needs:
+    - versio-checks
+    - cargo-checks
+  runs-on: ubuntu-latest
+  if: SNIPPET_not-skip-ci
+  outputs:
+    upload_url: ${{ steps.publish-to-github.outputs.upload_url }}
+  steps: SNIPPET_steps-github-publish
