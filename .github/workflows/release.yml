@@ -157,7 +157,7 @@ jobs:
         uses: chaaz/versio-actions/install@v1.1
       - name: Find version
         id: find-version
-        run: "echo ::set-output name=version::$(versio -l none info -i 0 -F | jq -r '.[0].full_version')"
+        run: "echo ::set-output name=version::$(versio -l none info -i 1 -F | jq -r '.[0].full_version')"
       - name: Publish to GitHub
         id: publish-to-github
         uses: actions/create-release@v1
