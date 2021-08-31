@@ -3,6 +3,8 @@ value:
   needs: versio-release
   runs-on: ubuntu-latest
   if: SNIPPET_not-skip-ci
+  environment: publish
+  env: SNIPPET_common-env
   outputs:
     upload_url: ${{ steps.publish-to-github.outputs.upload_url }}
   steps: SNIPPET_steps-github-publish

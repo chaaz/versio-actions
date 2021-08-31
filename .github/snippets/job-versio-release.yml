@@ -5,6 +5,8 @@ value:
     - versio-checks
   runs-on: ubuntu-latest
   if: SNIPPET_not-skip-ci
+  environment: publish
+  env: SNIPPET_common-env
   steps:
     - name: Checkout code
       uses: actions/checkout@v2

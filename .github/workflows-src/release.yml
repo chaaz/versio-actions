@@ -4,7 +4,6 @@
 name: release
 on:
   - workflow_dispatch
-env: SNIPPET_common-env
 
 jobs:
   project-matrixes: SNIPPET_job-project-matrixes

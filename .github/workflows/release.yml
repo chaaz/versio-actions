@@ -4,14 +4,15 @@
 name: release
 "on":
   - workflow_dispatch
-env:
-  RUSTFLAGS: "-D warnings"
-  GITHUB_TOKEN: "${{ secrets.DEPLOY_TOKEN }}"
-  GITHUB_USER: "${{ github.actor }}"
 jobs:
   project-matrixes:
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, 'skip ci')"
+    environment: publish
+    env:
+      RUSTFLAGS: "-D warnings"
+      GITHUB_TOKEN: "${{ secrets.DEPLOY_TOKEN }}"
+      GITHUB_USER: "${{ github.actor }}"
     outputs:
       cargo-matrix: "${{ steps.find-cargo-matrix.outputs.matrix }}"
       all-matrix: "${{ steps.find-all-matrix.outputs.matrix }}"
@@ -29,6 +30,11 @@ jobs:
   versio-checks:
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, 'skip ci')"
+    environment: publish
+    env:
+      RUSTFLAGS: "-D warnings"
+      GITHUB_TOKEN: "${{ secrets.DEPLOY_TOKEN }}"
+      GITHUB_USER: "${{ github.actor }}"
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -46,6 +52,11 @@ jobs:
     strategy:
       matrix: "${{ fromJson(needs.project-matrixes.outputs.cargo-matrix) }}"
     if: "!contains(github.event.head_commit.message, 'skip ci')"
+    environment: publish
+    env:
+      RUSTFLAGS: "-D warnings"
+      GITHUB_TOKEN: "${{ secrets.DEPLOY_TOKEN }}"
+      GITHUB_USER: "${{ github.actor }}"
     defaults:
       run:
         working-directory: "${{ matrix.root }}"
@@ -82,6 +93,11 @@ jobs:
       - versio-checks
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, 'skip ci')"
+    environment: publish
+    env:
+      RUSTFLAGS: "-D warnings"
+      GITHUB_TOKEN: "${{ secrets.DEPLOY_TOKEN }}"
+      GITHUB_USER: "${{ github.actor }}"
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -110,6 +126,11 @@ jobs:
     strategy:
       matrix: "${{fromJson(needs.project-matrixes.outputs.cargo-matrix)}}"
     if: "!contains(github.event.head_commit.message, 'skip ci')"
+    environment: publish
+    env:
+      RUSTFLAGS: "-D warnings"
+      GITHUB_TOKEN: "${{ secrets.DEPLOY_TOKEN }}"
+      GITHUB_USER: "${{ github.actor }}"
     defaults:
       run:
         working-directory: "${{ matrix.root }}"
@@ -146,6 +167,11 @@ jobs:
     needs: versio-release
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, 'skip ci')"
+    environment: publish
+    env:
+      RUSTFLAGS: "-D warnings"
+      GITHUB_TOKEN: "${{ secrets.DEPLOY_TOKEN }}"
+      GITHUB_USER: "${{ github.actor }}"
     outputs:
       upload_url: "${{ steps.publish-to-github.outputs.upload_url }}"
     steps:
@@ -189,6 +215,11 @@ jobs:
             rustflags: "-D warnings"
             bin_name: yambler.exe
     if: "!contains(github.event.head_commit.message, 'skip ci')"
+    environment: publish
+    env:
+      RUSTFLAGS: "-D warnings"
+      GITHUB_TOKEN: "${{ secrets.DEPLOY_TOKEN }}"
+      GITHUB_USER: "${{ github.actor }}"
     runs-on: "${{ matrix.os }}"
     steps:
       - name: Checkout release

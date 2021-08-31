@@ -2,6 +2,8 @@ key: job-project-matrixes
 value:
   runs-on: ubuntu-latest
   if: SNIPPET_not-skip-ci
+  environment: publish
+  env: SNIPPET_common-env
   outputs:
     cargo-matrix: ${{ steps.find-cargo-matrix.outputs.matrix }}
     all-matrix: ${{ steps.find-all-matrix.outputs.matrix }}

@@ -20,6 +20,8 @@ value:
           rustflags: '-D warnings'
           bin_name: 'yambler.exe'
   if: SNIPPET_not-skip-ci
+  environment: publish
+  env: SNIPPET_common-env
   runs-on: ${{ matrix.os }}
   steps:
     - name: Checkout release
