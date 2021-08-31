@@ -8,6 +8,7 @@ env:
   RUSTFLAGS: "-D warnings"
   GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
   GITHUB_USER: "${{ github.actor }}"
+permissions: write-all
 jobs:
   project-matrixes:
     runs-on: ubuntu-latest

@@ -5,6 +5,7 @@ name: release
 on:
   - workflow_dispatch
 env: SNIPPET_common-env
+permissions: write-all
 
 jobs:
   project-matrixes: SNIPPET_job-project-matrixes
