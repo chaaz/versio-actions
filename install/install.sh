@@ -13,7 +13,7 @@ chmod a+x $HOME/bin/versio
 # Also install rq
 curl -LSfs https://japaric.github.io/trust/install.sh \
     | sh -s -- --git dflemstr/rq --target x86_64-unknown-linux-gnu \
-    --to $HOME/bin
+    --tag 1.0.2 --to $HOME/bin
 
 
 # non-jq technique:
