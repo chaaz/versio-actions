@@ -6,7 +6,7 @@ value:
   env: SNIPPET_common-env
   steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Get versio
       uses: chaaz/versio-actions/install@v1.2
     - name: Fetch history
