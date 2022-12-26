@@ -23,10 +23,10 @@ jobs:
         uses: chaaz/versio-actions/install@v1.1
       - name: Find cargo matrix
         id: find-cargo-matrix
-        run: "echo \"::set-output name=matrix::{\\\"include\\\":$(versio -l none info -l cargo -R -N)}\""
+        run: "echo \"matrix=\\\"{\\\\\\\"include\\\\\\\":$(versio -l none info -l cargo -R -N)}\\\"\" >> $GITHUB_OUTPUT"
       - name: Find all matrix
         id: find-all-matrix
-        run: "echo \"::set-output name=matrix::{\\\"include\\\":$(versio -l none info -a -R -N)}\""
+        run: "echo \"matrix=\\\"{\\\\\\\"include\\\\\\\":$(versio -l none info -a -R -N)}\\\"\" >> $GITHUB_OUTPUT"
   versio-checks:
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, 'skip ci')"
@@ -75,7 +75,7 @@ jobs:
           components: rustfmt
       - name: Find paths
         id: cargo-find-paths
-        run: "echo ::set-output name=cargo-lock-glob::\"${{ matrix.root }}\"/**/Cargo.lock"
+        run: "echo \"cargo-lock-glob=\\\"${{ matrix.root }}\\\"/**/Cargo.lock\" >> $GITHUB_OUTPUT"
       - name: Cache cargo and target
         uses: actions/cache@v1
         with:

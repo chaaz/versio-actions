@@ -29,5 +29,5 @@ runs:
       shell: bash
     - run: cp ${{ github.action_path }}/cargo-version $HOME/bin/cargo-version
       shell: bash
-    - run: echo "::set-output name=versio::$(versio -V | cut -d' ' -f 2)"
+    - run: echo "versio=\"$(versio -V | cut -d' ' -f 2)\"" >> $GITHUB_OUTPUT
       shell: bash

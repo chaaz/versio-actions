@@ -1,11 +1,10 @@
-release_identifier=$INPUT_VERSION
+release_identifier=${INPUT_VERSION}
 
-apt-get update && apt-get install -y curl
+echo "getting ${release_identifier}"
 
 versio_binary_url=`\
   curl -sL https://api.github.com/repos/chaaz/versio/releases/${release_identifier} \
   | jq -r '.assets[] | select(.browser_download_url | contains("linux-gnu")) | .browser_download_url'`
-
 
 curl -L $versio_binary_url -o $HOME/bin/versio
 chmod a+x $HOME/bin/versio
