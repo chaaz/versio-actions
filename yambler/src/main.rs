@@ -86,7 +86,7 @@ fn read_inputs(input_file: &str, output_file: &str) -> Result<Vec<(PathBuf, Path
 /// files in the directory are counted. The resulting hashmap are the keyed YAML snippets which are found in all
 /// files.
 fn read_snips(snips: &[&str]) -> Result<HashMap<String, Yaml>> {
-  let snips = snips.iter().map(|s| Path::new(s)).collect::<Vec<_>>();
+  let snips = snips.iter().map(Path::new).collect::<Vec<_>>();
   let snips: Vec<_> = if snips.len() == 1 && snips[0].is_dir() {
     snips[0]
       .read_dir()?
