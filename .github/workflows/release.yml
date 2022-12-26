@@ -20,7 +20,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Get versio
-        uses: chaaz/versio-actions/install@v1.1
+        uses: chaaz/versio-actions/install@v1.2
       - name: Find cargo matrix
         id: find-cargo-matrix
         run: "echo \"matrix=\\\"{\\\\\\\"include\\\\\\\":$(versio -l none info -l cargo -R -N)}\\\"\" >> $GITHUB_OUTPUT"
@@ -39,7 +39,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Get versio
-        uses: chaaz/versio-actions/install@v1.1
+        uses: chaaz/versio-actions/install@v1.2
       - name: Fetch history
         run: git fetch --unshallow
       - name: Check projects
@@ -102,7 +102,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Get versio
-        uses: chaaz/versio-actions/install@v1.1
+        uses: chaaz/versio-actions/install@v1.2
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y libgpg-error-dev libgpgme-dev
       - name: Get cargo stable
@@ -180,7 +180,7 @@ jobs:
         with:
           ref: main
       - name: Get versio
-        uses: chaaz/versio-actions/install@v1.1
+        uses: chaaz/versio-actions/install@v1.2
       - name: Find version
         id: find-version
         run: "echo \"version=\\\"$(versio -l none info -i 1 -F | jq -r ''.[0].full_version'')\\\"\" >> $GITHUB_OUTPUT"

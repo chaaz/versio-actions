@@ -11,7 +11,7 @@ value:
     - name: Checkout code
       uses: actions/checkout@v2
     - name: Get versio
-      uses: chaaz/versio-actions/install@v1.1
+      uses: chaaz/versio-actions/install@v1.2
     - SNIPPET_get-cargo-minimal
     - name: Fetch history
       run: git fetch --unshallow
