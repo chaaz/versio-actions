@@ -14,7 +14,7 @@ value:
       uses: chaaz/versio-actions/install@v1.2
     - name: Find cargo matrix
       id: find-cargo-matrix
-      run: echo "matrix=\"{\\\"include\\\":$(versio -l none info -l cargo -R -N)}\"" >> $GITHUB_OUTPUT
+      run: echo matrix={\"include\":$(versio -l none info -l cargo -R -N)} >> $GITHUB_OUTPUT
     - name: Find all matrix
       id: find-all-matrix
-      run: echo "matrix=\"{\\\"include\\\":$(versio -l none info -a -R -N)}\"" >> $GITHUB_OUTPUT
+      run: echo matrix={\"include\":$(versio -l none info -a -R -N)} >> $GITHUB_OUTPUT
